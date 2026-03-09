@@ -6,12 +6,44 @@
 
 #include "core/Window.hpp"
 
+
+
+
+// function to resize the glViewport if the window is resized
+void window_resize_callback(GLFWwindow* window, int width, int height) {
+#if defined (USE_WINDOW_BACKEND_LIBRARY_SDL)
+#elif defined(USE_WINDOW_BACKEND_LIBRARY_GLFW)
+    float aspectRatio = 1.0f / 1.0f;
+    int viewportWidth = width;
+    int viewportHeight = height;
+    if (width > (height * aspectRatio)) {
+        viewportWidth = (height * aspectRatio);
+    } else {
+        viewportHeight = width / aspectRatio;
+    }
+
+    glViewport( ( (width / 2) - (viewportWidth / 2) ),
+                ( (height / 2) - (viewportHeight / 2) ),
+                viewportWidth, 
+                viewportHeight 
+    );
+}
+#endif
+
+
+
+
+// window constructor
 Window::Window(int width, int height, const std::string& title) {
   this->width  = width;
   this->height = height;
   this->title  = title;
 }
 
+
+
+
+// window destructor
 Window::~Window() {
 #if defined(USE_WINDOW_BACKEND_LIBRARY_SDL)
 #elif defined(USE_WINDOW_BACKEND_LIBRARY_GLFW)
@@ -21,6 +53,7 @@ Window::~Window() {
 
 
 
+// start gflw or sdl backend (depends on which one you use)
 int Window::initBackend() {
 #if defined(USE_WINDOW_BACKEND_LIBRARY_SDL)
 
@@ -39,6 +72,7 @@ int Window::initBackend() {
 
 
 
+// initialize window properties
 int Window::init() {
 #if defined(USE_WINDOW_BACKEND_LIBRARY_SDL)
 
@@ -70,6 +104,8 @@ int Window::init() {
     return 1;
   }
 
+  glfwSetFramebufferSizeCallback(window, window_resize_callback);
+
   return 0;
 
 #endif
@@ -78,6 +114,7 @@ int Window::init() {
 
 
 
+// destroy window
 int Window::destroy() {
 #if defined(USE_WINDOW_BACKEND_LIBRARY_SDL)
   
@@ -95,8 +132,8 @@ int Window::destroy() {
 
 
 
+// return if window is visible
 // assuming this->window != NULL
-
 bool Window::isVisible() const {
 #if defined(USE_WINDOW_BACKEND_LIBRARY_SDL)
 #elif defined(USE_WINDOW_BACKEND_LIBRARY_GLFW)
@@ -154,5 +191,15 @@ double Window::getCurrentTime() {
 #if defined(USE_WINDOW_BACKEND_LIBRARY_SDL)
 #elif defined(USE_WINDOW_BACKEND_LIBRARY_GLFW)
   return glfwGetTime();
+#endif
+}
+
+
+
+
+bool Window::shouldClose() {
+#if defined(USE_WINDOW_BACKEND_LIBRARY_SDL)
+#elif defined(USE_WINDOW_BACKEND_LIBRARY_GLFW)
+  return glfwWindowShouldClose(this->window);
 #endif
 }

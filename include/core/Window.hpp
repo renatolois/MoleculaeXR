@@ -52,4 +52,6 @@ public:
   void swapBuffers();
 
   double getCurrentTime();
+
+  bool shouldClose();
 };

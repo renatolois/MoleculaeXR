@@ -26,6 +26,7 @@ file ( GLOB_RECURSE STB_SRC
 
 file(GLOB_RECURSE SOURCE_FILES
     src/*.cpp
+    src/*.c
 )
 
 
@@ -52,13 +53,7 @@ add_executable( MoleculaeXR
 )
 
 find_package(glfw3 3.3 REQUIRED)
-find_package(OpenCV REQUIRED REQUIRED core imgproc highgui videoio)
+find_package(OpenCV REQUIRED COMPONENTS core imgproc highgui videoio aruco)
 target_link_libraries(MoleculaeXR PRIVATE glfw m ${OpenCV_LIBS})
 
 include_directories(${OpenCV_INCLUDE_DIRS})
-
-target_precompile_headers(MoleculaeXR PRIVATE
-    "$<$<COMPILE_LANGUAGE:CXX>:<stb/stb_image.h>>"
-    "$<$<COMPILE_LANGUAGE:CXX>:<stb/stb_image_resize.h>>"
-    "$<$<COMPILE_LANGUAGE:CXX>:<opencv2/opencv.hpp>>"
-)
